@@ -9,7 +9,7 @@ import {
     CreateUserParams,
     DiscordOAuth2UserResponds
 } from '../../utils/types';
-import { UserModel } from '../../models/User';
+import { IUser, User as UserModel } from '../../models/User';
 
 export async function exchangeAccessTokenForCredentials(data: OAuth2ExchangeRequestParams) {
     const r = await axios.post<DiscordOAuth2CredentialsResponds>(`${process.env.DISCORD_API_ENDPOINT}/oauth2/token`, convertObjectToURLSearchParams(data), axiosConfig);
@@ -32,11 +32,16 @@ export async function exchangeAccessTokenForUserData(token: string) {
 }
 
 export async function createUser(params: CreateUserParams) {
-    const user = await UserModel.findOne({ id: params.id });
+    const user: IUser = await UserModel.findOne({ id: params.id });
     if (user) return user;
 
     const newUser = new UserModel(params);
-    return newUser.save().catch((e) => console.log(e));
+    await newUser.save().catch((e) => console.log(e));
+    return newUser;
+}
+
+export async function removeUserByAccessToken(token: string) {
+    await UserModel.deleteOne({ access_token: token });
 }
 
 export async function getRefreshToken(token: string) {

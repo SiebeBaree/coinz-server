@@ -1,11 +1,20 @@
-import { Request, Response } from "express";
-import { createUser, exchangeAccessTokenForCredentials, exchangeAccessTokenForUserData, exchangeRefreshTokenForCredentials, getRefreshToken, revokeTokenFromUser, updateCredentials } from "../../services/discord";
+import { Request, Response } from "express"
+import { IUser } from "../../models/User"
+import {
+    createUser,
+    exchangeAccessTokenForCredentials,
+    exchangeAccessTokenForUserData,
+    exchangeRefreshTokenForCredentials,
+    getRefreshToken,
+    removeUserByAccessToken,
+    revokeTokenFromUser,
+    updateCredentials
+} from "../../services/discord"
 
 const REDIRECT_URI = process.env.WEBAPP_URL + "/callback";
 
 export async function callbackController(req: Request, res: Response) {
     const { token } = req.body;
-    console.log(token)
     if (!token) return res.status(400).send({ error: 'No token provided' });
 
     const data = await exchangeAccessTokenForCredentials({
@@ -18,20 +27,26 @@ export async function callbackController(req: Request, res: Response) {
 
     if (data.code === 50035) return res.status(401).send({ error: 'Invalid token' });
 
-    const user = await exchangeAccessTokenForUserData(data.access_token);
-    const newUser = await createUser({
-        id: user.id,
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
-        expires_in: Math.floor(Date.now() / 1000) + (data.expires_in || 604800)
+    exchangeAccessTokenForUserData(data.access_token).then((user) => {
+        createUser({
+            id: user.id,
+            access_token: data.access_token,
+            refresh_token: data.refresh_token,
+            expires_in: Math.floor(Date.now() / 1000) + (data.expires_in || 604800)
+        }).then((newUser: IUser) => {
+            return res.send({
+                id: newUser.id,
+                access_token: newUser.access_token,
+                refresh_token: newUser.refresh_token,
+                expires_in: newUser.expires_in,
+                avatar: user.avatar,
+                discriminator: user.discriminator,
+                username: user.username
+            });
+        }).catch(() => res.sendStatus(401).send({ error: 'Invalid token' }));
     });
 
-    return res.send({
-        ...newUser,
-        avatar: user.avatar,
-        discriminator: user.discriminator,
-        username: user.username
-    });
+    return res.sendStatus(401).send({ error: 'Invalid token' });
 }
 
 export async function refreshController(req: Request, res: Response) {
@@ -68,8 +83,7 @@ export async function revokeController(req: Request, res: Response) {
         token: token
     });
 
-    // Remove user session from DB
-
+    await removeUserByAccessToken(token);
     return res.send(data);
 }
 
