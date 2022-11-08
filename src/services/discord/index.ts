@@ -9,7 +9,7 @@ import {
     CreateUserParams,
     DiscordOAuth2UserResponds
 } from '../../utils/types';
-import { IUser, User as UserModel } from '../../models/User';
+import { User as UserModel } from '../../models/User';
 
 export async function exchangeAccessTokenForCredentials(data: OAuth2ExchangeRequestParams) {
     const r = await axios.post<DiscordOAuth2CredentialsResponds>(`${process.env.DISCORD_API_ENDPOINT}/oauth2/token`, convertObjectToURLSearchParams(data), axiosConfig);
@@ -32,12 +32,7 @@ export async function exchangeAccessTokenForUserData(token: string) {
 }
 
 export async function createUser(params: CreateUserParams) {
-    const user: IUser = await UserModel.findOne({ id: params.id });
-    if (user) return user;
-
-    const newUser = new UserModel(params);
-    await newUser.save().catch((e) => console.log(e));
-    return newUser;
+    return await updateCredentials(params);
 }
 
 export async function removeUserByAccessToken(token: string) {
@@ -50,9 +45,5 @@ export async function getRefreshToken(token: string) {
 }
 
 export async function updateCredentials(params: CreateUserParams) {
-    return await UserModel.findOneAndUpdate({ id: params.id }, {
-        access_token: params.access_token,
-        refresh_token: params.refresh_token,
-        expires_in: params.expires_in
-    }, { upsert: true });
+    return await UserModel.findOneAndUpdate({ id: params.id }, params, { upsert: true, new: true });
 }
