@@ -14,4 +14,4 @@ const UserSchema = new Schema<IUser>({
     expires_in: { type: Number, default: Math.floor(Date.now() / 1000) + 604800 },
 });
 
-export const User = model<IUser>('User', UserSchema);
+export const User = model<IUser>('User', UserSchema, 'users');
