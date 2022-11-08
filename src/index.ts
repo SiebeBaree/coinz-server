@@ -28,3 +28,16 @@ import app from './api';
 
 const port = process.env.PORT || 3300;
 app.listen(port, () => console.log(`API available on http://localhost:${port}`));
+
+const ignoredErrors = [];
+process.on('uncaughtException', (err: Error) => {
+    if (!ignoredErrors.includes(`${err.name}: ${err.message}`)) {
+        console.error(err.stack);
+    }
+});
+
+process.on('unhandledRejection', (err: Error) => {
+    if (!ignoredErrors.includes(`${err.name}: ${err.message}`)) {
+        console.error(err.stack);
+    }
+});
