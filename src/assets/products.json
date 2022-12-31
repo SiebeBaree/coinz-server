@@ -1,0 +1,12 @@
+{
+    "subscriptions": {
+        "premium_1": {
+            "name": "Coinz Premium",
+            "price": 200,
+            "description": "Subscribe to Coinz Premium, all premium features are listed on coinzbot.xyz/store"
+        }
+    },
+    "tickets": {
+        "price": 1
+    }
+}
