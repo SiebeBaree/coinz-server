@@ -53,3 +53,12 @@ export type CreateUserParams = {
     refresh_token: string;
     expires_in?: number;
 }
+
+export type Shard = {
+    id: number;
+    cluster: number;
+    ping: number;
+    guildcount: number;
+    cpu: number;
+    ram: number;
+}
