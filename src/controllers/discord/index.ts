@@ -1,5 +1,4 @@
 import { Request, Response } from "express"
-import { Guild } from "../../models/Guild";
 import { IUser, User } from "../../models/User"
 import {
     createUser,
@@ -108,27 +107,4 @@ export async function authorizeController(req: Request, res: Response) {
     const user = await User.findOne({ id: id });
     if (!user) return res.sendStatus(401);
     return res.sendStatus(user?.access_token === token ? 200 : 401);
-}
-
-export async function guildController(req: Request, res: Response) {
-    const { guilds } = req.body;
-    if (!guilds) return res.status(406).send({ error: 'No guilds provided' });
-    if (!Array.isArray(guilds) || guilds.length <= 0) return res.status(406).send({ error: 'Guilds must be an array with at least one guild' });
-    if (guilds.length >= 30) return res.status(413).send({ error: 'Too many guilds provided' });
-
-    const premiumGuilds = await Guild.find({ id: { $in: guilds } });
-    if (premiumGuilds.length <= 0) return res.send({ guilds: {} });
-
-    const mappedGuilds = {};
-    premiumGuilds.forEach(guild => {
-        mappedGuilds[guild.id] = guild.premium;
-    });
-    const guildKeys = Object.keys(mappedGuilds);
-
-    const guildsObject = {};
-    guilds.forEach(guild => {
-        guildsObject[guild] = guildKeys.includes(guild) ? mappedGuilds[guild] : null;
-    });
-
-    return res.send({ guilds: guildsObject });
 }
