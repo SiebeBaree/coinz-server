@@ -15,7 +15,9 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "fs": "^0.0.1-security",
     "mongoose": "^6.7.0",
+    "sharding-stats": "^2.2.0",
     "stripe": "^10.15.0"
   },
   "devDependencies": {
