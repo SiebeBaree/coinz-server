@@ -1,5 +1,5 @@
-import { Request, Response } from "express"
-import { IUser, User } from "../../models/User"
+import { Request, Response } from "express";
+import User, { IUser } from "../../models/User";
 import {
     createUser,
     exchangeAccessTokenForCredentials,
@@ -8,24 +8,24 @@ import {
     getRefreshToken,
     removeUserByAccessToken,
     revokeTokenFromUser,
-    updateCredentials
-} from "../../services/discord"
+    updateCredentials,
+} from "../../services/discord";
 
 const REDIRECT_URI = process.env.WEBAPP_URL + "/callback";
 
 export async function callbackController(req: Request, res: Response) {
     const { token } = req.body;
-    if (!token) return res.status(400).send({ error: 'No token provided' });
+    if (!token) return res.status(400).send({ error: "No token provided" });
 
     const data = await exchangeAccessTokenForCredentials({
         client_id: process.env.DISCORD_CLIENT_ID,
         client_secret: process.env.DISCORD_CLIENT_SECRET,
-        grant_type: 'authorization_code',
+        grant_type: "authorization_code",
         code: token,
-        redirect_uri: REDIRECT_URI
+        redirect_uri: REDIRECT_URI,
     });
 
-    if (data.code === 50035) return res.status(401).send({ error: 'Invalid token' });
+    if (data.code === 50035) return res.status(401).send({ error: "Invalid token" });
 
     try {
         const user = await exchangeAccessTokenForUserData(data.access_token);
@@ -34,7 +34,7 @@ export async function callbackController(req: Request, res: Response) {
             id: user.id,
             access_token: data.access_token,
             refresh_token: data.refresh_token,
-            expires_in: data.expires_in
+            expires_in: data.expires_in,
         });
 
         return res.send({
@@ -45,32 +45,32 @@ export async function callbackController(req: Request, res: Response) {
             token_type: data.token_type || "Bearer",
             avatar: user.avatar,
             discriminator: user.discriminator,
-            username: user.username
+            username: user.username,
         });
     } catch (e) {
-        return res.status(401).send({ error: 'Invalid Token' });
+        return res.status(401).send({ error: "Invalid Token" });
     }
 }
 
 export async function refreshController(req: Request, res: Response) {
     const { token } = req.body;
-    if (!token) return res.status(400).send({ error: 'No token provided' });
+    if (!token) return res.status(400).send({ error: "No token provided" });
 
     const user = await getRefreshToken(token);
-    if (user === null) return res.status(401).send({ error: 'Invalid token' });
+    if (user === null) return res.status(401).send({ error: "Invalid token" });
 
     const data = await exchangeRefreshTokenForCredentials({
         client_id: process.env.DISCORD_CLIENT_ID,
         client_secret: process.env.DISCORD_CLIENT_SECRET,
-        grant_type: 'refresh_token',
-        refresh_token: user.refresh_token
+        grant_type: "refresh_token",
+        refresh_token: user.refresh_token,
     });
 
     const userData = await updateCredentials({
         id: user.id,
         access_token: data.access_token,
         refresh_token: data.refresh_token,
-        expires_in: Math.floor(Date.now() / 1000) + (data.expires_in || 604800)
+        expires_in: Math.floor(Date.now() / 1000) + (data.expires_in || 604800),
     });
 
     return res.send(userData);
@@ -78,12 +78,12 @@ export async function refreshController(req: Request, res: Response) {
 
 export async function revokeController(req: Request, res: Response) {
     const { token } = req.body;
-    if (!token) return res.status(400).send({ error: 'No token provided' });
+    if (!token) return res.status(400).send({ error: "No token provided" });
 
     const data = await revokeTokenFromUser({
         client_id: process.env.DISCORD_CLIENT_ID,
         client_secret: process.env.DISCORD_CLIENT_SECRET,
-        token: token
+        token: token,
     });
 
     await removeUserByAccessToken(token);
@@ -92,17 +92,17 @@ export async function revokeController(req: Request, res: Response) {
 
 export async function userController(req: Request, res: Response) {
     const { token } = req.query;
-    if (!token) return res.status(400).send({ error: 'No token provided' });
+    if (!token) return res.status(400).send({ error: "No token provided" });
 
     const user = await exchangeAccessTokenForUserData(token as string).catch(() => {
-        return res.status(401).send({ error: 'Unauthorized' });
+        return res.status(401).send({ error: "Unauthorized" });
     });
     return res.send(user);
 }
 
 export async function authorizeController(req: Request, res: Response) {
     const { id, token } = req.query;
-    if (!id || !token) return res.status(400).send({ error: 'No token provided' });
+    if (!id || !token) return res.status(400).send({ error: "No token provided" });
 
     const user = await User.findOne({ id: id });
     if (!user) return res.sendStatus(401);

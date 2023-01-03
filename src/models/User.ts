@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model } from "mongoose";
 
 export interface IUser {
     id: string;
@@ -14,4 +14,4 @@ const UserSchema = new Schema<IUser>({
     expires_in: { type: Number, default: Math.floor(Date.now() / 1000) + 604800 },
 });
 
-export const User = model<IUser>('User', UserSchema, 'users');
+export default model<IUser>("User", UserSchema);
