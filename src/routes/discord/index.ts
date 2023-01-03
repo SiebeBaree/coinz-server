@@ -1,10 +1,10 @@
-import { Router } from "express"
+import { Router } from "express";
 import {
     callbackController,
     refreshController,
     revokeController,
-    authorizeController
-} from '../../controllers/discord'
+    authorizeController,
+} from "../../controllers/discord";
 
 const router = Router();
 

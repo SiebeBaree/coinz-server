@@ -1,15 +1,15 @@
-import axios from 'axios';
-import { axiosConfig } from '../../utils/constants';
-import { convertObjectToURLSearchParams, userAuthHeaders } from '../../utils/helpers';
+import axios from "axios";
+import { axiosConfig } from "../../utils/constants";
+import { convertObjectToURLSearchParams, userAuthHeaders } from "../../utils/helpers";
 import {
     DiscordOAuth2CredentialsResponds,
     OAuth2ExchangeRefreshRequestParams,
     OAuth2ExchangeRequestParams,
     OAuth2RevokeTokenRequestParams,
     CreateUserParams,
-    DiscordOAuth2UserResponds
-} from '../../utils/types';
-import { User as UserModel } from '../../models/User';
+    DiscordOAuth2UserResponds,
+} from "../../utils/types";
+import User from "../../models/User";
 
 export async function exchangeAccessTokenForCredentials(data: OAuth2ExchangeRequestParams) {
     const r = await axios.post<DiscordOAuth2CredentialsResponds>(`${process.env.DISCORD_API_ENDPOINT}/oauth2/token`, convertObjectToURLSearchParams(data), axiosConfig);
@@ -36,14 +36,14 @@ export async function createUser(params: CreateUserParams) {
 }
 
 export async function removeUserByAccessToken(token: string) {
-    await UserModel.deleteOne({ access_token: token });
+    await User.deleteOne({ access_token: token });
 }
 
 export async function getRefreshToken(token: string) {
-    const user = await UserModel.findOne({ refresh_token: token });
+    const user = await User.findOne({ refresh_token: token });
     return user || null;
 }
 
 export async function updateCredentials(params: CreateUserParams) {
-    return await UserModel.findOneAndUpdate({ id: params.id }, params, { upsert: true, new: true });
+    return await User.findOneAndUpdate({ id: params.id }, params, { upsert: true, new: true });
 }
