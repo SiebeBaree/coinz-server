@@ -1,16 +1,12 @@
 import { Router } from "express";
-import {
-    callbackController,
-    refreshController,
-    revokeController,
-    authorizeController,
-} from "../../controllers/discord";
+import passport from "passport";
+import { loginController, redirectController } from "../../controllers/discord";
 
 const router = Router();
 
-router.post("/callback", callbackController);
-router.post("/refresh", refreshController);
-router.post("/revoke", revokeController);
-router.get("/authorize", authorizeController);
+router.get("/", passport.authenticate("discord"), loginController);
+router.get("/redirect", passport.authenticate("discord", {
+    failureRedirect: "/",
+}), redirectController);
 
 export default router;

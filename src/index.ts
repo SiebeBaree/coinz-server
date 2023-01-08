@@ -8,6 +8,7 @@ import { Request, Response } from "express";
 import Stats from "./stats";
 import app from "./api";
 import "./stripe";
+import "./strategies/discord";
 
 // Connect to MongoDB
 connect(process.env.DATABASE_URI, {
