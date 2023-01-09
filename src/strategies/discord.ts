@@ -4,7 +4,7 @@ import WebUser from "../models/WebUser";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 passport.serializeUser((user: any, done) => {
-    done(null, user);
+    done(null, user.id);
 });
 
 passport.deserializeUser(async (id: string, done) => {
@@ -25,11 +25,11 @@ passport.use(
     new Strategy({
         clientID: process.env.DISCORD_CLIENT_ID,
         clientSecret: process.env.DISCORD_CLIENT_SECRET,
-        callbackURL: process.env.DISCORD_CALLBACK_URL + "/discord/redirect",
+        callbackURL: process.env.DISCORD_CALLBACK_URL + "/auth/redirect",
         scope: ["identify", "guilds"],
     }, async (accessToken, refreshToken, profile, done) => {
         try {
-            const webUser = await WebUser.findOneAndUpdate({ id: profile.id }, {
+            const webUser = await WebUser.findOneAndUpdate({ discordId: profile.id }, {
                 accessToken,
                 refreshToken,
             }, { upsert: true, new: true });

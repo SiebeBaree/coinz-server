@@ -1,9 +1,18 @@
 import { Request, Response } from "express";
+import { IWebUser } from "../../models/WebUser";
+import { getUserService } from "../../services/discord";
 
-export async function loginController(req: Request, res: Response) {
-    res.redirect("/updates");
-}
+export const getUserController = async (req: Request, res: Response) => {
+    const user = req.user as IWebUser;
+    if (user === undefined) {
+        res.status(401).send({ error: "Unauthorized" });
+        return;
+    }
 
-export async function redirectController(req: Request, res: Response) {
-    res.redirect("/updates");
-}
+    try {
+        const { data } = await getUserService(user.id);
+        res.send(data);
+    } catch (error) {
+        res.status(401).send({ error: "Unauthorized" });
+    }
+};

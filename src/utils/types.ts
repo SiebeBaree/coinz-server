@@ -6,3 +6,10 @@ export type Shard = {
     cpu: number;
     ram: number;
 }
+
+export type User = {
+    id: string;
+    username: string;
+    discriminator: string;
+    avatar: string | null;
+}
