@@ -12,7 +12,7 @@ import "./strategies/discord";
 
 // Connect to MongoDB
 connect(process.env.DATABASE_URI, {
-    dbName: process.env.NODE_ENV === "production" ? "coinz" : "coinz_beta",
+    dbName: process.env.NODE_ENV === "production" ? "coinz_v3" : "coinz_v3_beta",
     maxPoolSize: 100,
     minPoolSize: 5,
     family: 4,
