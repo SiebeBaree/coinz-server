@@ -8,8 +8,8 @@ import passport from "passport";
 const app = express();
 
 app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use((req, res, next) => req.originalUrl === "/api/stripe/webhooks" ? next() : express.json()(req, res, next));
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -17,7 +17,6 @@ app.use(session({
     store: MongoStore.create({
         mongoUrl: process.env.DATABASE_URI,
         ttl: 60 * 60 * 24 * 7,
-        dbName: "coinz_v3_beta",
     }),
 }));
 app.use(passport.initialize());
