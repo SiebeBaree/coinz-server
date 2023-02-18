@@ -23,7 +23,7 @@ connect(process.env.DATABASE_URI, {
 // Start the stats server
 const stats = new Stats(app).statsServer;
 
-app.get("/api/status", (req: Request, res: Response) => {
+app.get("/stats", (req: Request, res: Response) => {
     const data = stats.getStatsData().raw.shards;
     const sorted = stats.chunkShardsToClusterArrays(data);
 
