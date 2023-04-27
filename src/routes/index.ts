@@ -1,12 +1,8 @@
 import { Router } from "express";
-import authRoutes from "./auth";
-import discordRoutes from "./discord";
-import stripeRoutes from "./stripe";
+import shopRoutes from "./shop";
 
 const router = Router();
 
-router.use("/auth", authRoutes);
-router.use("/discord", discordRoutes);
-router.use("/stripe", stripeRoutes);
+router.use("/shop", shopRoutes);
 
 export default router;
