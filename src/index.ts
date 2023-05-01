@@ -2,23 +2,10 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { connect } from "mongoose";
 import { Shard } from "./utils/types";
 import { Request, Response } from "express";
 import Stats from "./stats";
 import app from "./api";
-import "./stripe";
-import "./strategies/discord";
-
-// Connect to MongoDB
-connect(process.env.DATABASE_URI, {
-    maxPoolSize: 100,
-    minPoolSize: 5,
-    family: 4,
-    heartbeatFrequencyMS: 30000,
-    keepAlive: true,
-    keepAliveInitialDelay: 300000,
-}).then(() => console.log("Connected to MongoDB"));
 
 // Start the stats server
 const stats = new Stats(app).statsServer;
